@@ -26,6 +26,9 @@ uvx copier copy -d use_docker=true gh:sgjholt/data-science-project-templates my-
 Copier prompts for the remaining answers (`project_name`, `project_slug`, `description`,
 `author_name`, `python_version`, `use_docker`). Add `--defaults` to skip prompts.
 
+Python versioning policy: default to **N-1**, one minor behind the newest CPython release
+(currently `3.14`; `3.12` and `3.13` selectable).
+
 Then:
 
 ```bash
@@ -60,7 +63,7 @@ my-project/
 │   ├── pre_processing/          # clean + split -> data/processed
 │   ├── model/                   # hydra.utils.instantiate(cfg.model.estimator) + fit
 │   ├── post_processing/         # metrics.json, predictions.csv, report
-│   ├── logger.py  tracking.py
+│   ├── logger.py  tracking.py  compat.py
 │   └── main.py                  # @hydra.main entrypoint, one MLflow run per job
 ├── outputs/                     # one folder per run (git-ignored)
 ├── mlruns/                      # MLflow SQLite DB + artifacts (git-ignored)
@@ -86,6 +89,10 @@ docker compose up mlflow                                    # Docker variant, UI
 - `logger.py` lives in `src/`, not the project root: `uv run src/main.py` puts `src/` on
   `sys.path`, so a root-level module would not be importable without path hacks.
 - `src/tracking.py` holds the MLflow setup (tracking URI, experiment, config -> params).
+- `src/compat.py`: hydra-core 1.3.8 (latest stable) crashes on Python 3.14 at startup
+  (`ValueError: badly formed help string`; 3.14 argparse rejects Hydra's non-`str` help
+  object). The shim converts that help object to `str` on 3.14 only. Remove it and the import
+  in `main.py` once hydra-core 1.4 is released (1.4.0rc3 fixes it).
 - MLflow uses a SQLite backend at `mlruns/mlflow.db`. MLflow 3.x raises on the plain
   file-store backend (`./mlruns`), so `mlflow ui` needs `--backend-store-uri sqlite:///mlruns/mlflow.db`.
 

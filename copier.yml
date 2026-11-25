@@ -33,12 +33,14 @@ author_name:
 
 python_version:
   type: str
-  help: Python version (pinned in .python-version and the Docker base image)
-  default: "3.12"
+  # Policy: default to N-1, one minor behind the newest CPython release, so the
+  # scientific stack (wheels for numpy, scipy, sklearn, mlflow deps) is fully available.
+  help: Python version (pinned in .python-version and the Docker base image); default is N-1
+  default: "3.14"
   choices:
-    - "3.11"
     - "3.12"
     - "3.13"
+    - "3.14"
 
 use_docker:
   type: bool

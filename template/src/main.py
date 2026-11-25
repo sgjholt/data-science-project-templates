@@ -22,6 +22,7 @@ from hydra.core.hydra_config import HydraConfig
 from loguru import logger
 from omegaconf import DictConfig, OmegaConf
 
+import compat  # noqa: F401  (must precede @hydra.main use on Python 3.14)
 import ingest
 import model
 import post_processing
