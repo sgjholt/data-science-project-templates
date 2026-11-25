@@ -1,0 +1,40 @@
+[project]
+name = "{{ project_slug }}"
+version = "0.1.0"
+description = "{{ description }}"
+readme = "README.md"
+{%- if author_name %}
+authors = [{ name = "{{ author_name }}" }]
+{%- endif %}
+requires-python = ">={{ python_version }}"
+dependencies = [
+    "hydra-core>=1.3.2",
+    "loguru>=0.7",
+    "mlflow>=3.18",  # sqlite backend + skops model serialisation
+    "pandas>=2.2",
+    "scikit-learn>=1.5",
+    "skops>=0.11",
+]
+
+[dependency-groups]
+dev = [
+    "ipykernel>=6.29",
+    "pytest>=8.0",
+    "ruff>=0.6",
+]
+
+[tool.uv]
+# Application, not a library: code is run from src/ (uv run src/main.py), not installed.
+package = false
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]
+addopts = "-ra"
+
+[tool.ruff]
+line-length = 100
+target-version = "py{{ python_version | replace('.', '') }}"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B"]

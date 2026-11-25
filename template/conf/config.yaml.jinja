@@ -1,0 +1,39 @@
+# Root Hydra config. Every key can be overridden from the CLI:
+#   uv run src/main.py model=logistic_regression split.test_size=0.3
+# Sweep (one run + one MLflow run per combination):
+#   uv run src/main.py -m model=random_forest,logistic_regression seed=0,1,2
+defaults:
+  - data: wine
+  - model: random_forest
+  - _self_
+  # Loguru owns logging (see src/logger.py); stop Hydra configuring the stdlib logger.
+  - override hydra/job_logging: none
+
+seed: 42
+
+paths:
+  raw_dir: data/raw
+  processed_dir: data/processed
+
+split:
+  test_size: 0.2
+  stratify: true
+
+log_level: INFO
+
+mlflow:
+  # SQLite backend + local artifact folder, both inside mlruns/.
+  # View with: uv run mlflow ui --backend-store-uri sqlite:///mlruns/mlflow.db
+  tracking_uri: sqlite:///mlruns/mlflow.db
+  artifact_dir: mlruns/artifacts
+  experiment_name: {{ project_slug }}
+  log_model: true
+
+hydra:
+  run:
+    dir: outputs/${now:%Y-%m-%d}/${now:%H-%M-%S}
+  sweep:
+    dir: outputs/multirun/${now:%Y-%m-%d}/${now:%H-%M-%S}
+    subdir: ${hydra.job.num}
+  job:
+    chdir: false

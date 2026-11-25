@@ -1,0 +1,19 @@
+name: test-template
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  render-and-test:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        use_docker: ["false", "true"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+      - name: Render template and test generated project
+        run: scripts/test-template.sh ${{ matrix.use_docker }}
