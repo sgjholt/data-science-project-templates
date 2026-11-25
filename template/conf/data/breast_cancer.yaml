@@ -1,0 +1,5 @@
+name: breast_cancer
+target: target
+loader:
+  _target_: sklearn.datasets.load_breast_cancer
+  as_frame: true

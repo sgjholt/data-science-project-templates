@@ -1,0 +1,63 @@
+# Copier template definition.
+# Usage:
+#   uvx copier copy gh:sgjholt/data-science-project-templates my-project
+#   uvx copier copy -d use_docker=true gh:sgjholt/data-science-project-templates my-project
+
+_min_copier_version: "9.0.0"
+_subdirectory: template
+_templates_suffix: .jinja
+
+project_name:
+  type: str
+  help: Human-readable project name
+  default: My DS Project
+
+project_slug:
+  type: str
+  help: Directory / package / MLflow experiment name (lowercase, underscores)
+  default: "{{ project_name | lower | replace(' ', '_') | replace('-', '_') }}"
+  validator: >-
+    {% if not (project_slug | regex_search('^[a-z][a-z0-9_]*$')) %}
+    Must start with a letter and contain only lowercase letters, digits and underscores.
+    {% endif %}
+
+description:
+  type: str
+  help: One-line project description
+  default: Config-driven, reproducible ML pipeline.
+
+author_name:
+  type: str
+  help: Author name
+  default: ""
+
+python_version:
+  type: str
+  help: Python version (pinned in .python-version and the Docker base image)
+  default: "3.12"
+  choices:
+    - "3.11"
+    - "3.12"
+    - "3.13"
+
+use_docker:
+  type: bool
+  help: Include Dockerfile, .dockerignore and compose.yaml?
+  default: false
+
+_message_after_copy: |
+  Project "{{ project_name }}" created in {{ _copier_conf.dst_path }}.
+
+  Next steps:
+    cd {{ _copier_conf.dst_path }}
+    git init && git add -A && git commit -m "Initial commit"
+    uv sync
+    uv run src/main.py
+    uv run mlflow ui --backend-store-uri sqlite:///mlruns/mlflow.db
+  {%- if use_docker %}
+
+  Docker:
+    docker compose build
+    docker compose run --rm train
+    docker compose up mlflow      # http://localhost:5000
+  {%- endif %}

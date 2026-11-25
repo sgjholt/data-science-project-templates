@@ -1,0 +1,7 @@
+# Dataset config. `loader` is instantiated by Hydra (src/ingest).
+# Swap dataset from the CLI: uv run src/main.py data=breast_cancer
+name: wine
+target: target
+loader:
+  _target_: sklearn.datasets.load_wine
+  as_frame: true

@@ -1,0 +1,11 @@
+# Model config. `estimator` is instantiated by Hydra (src/model).
+# Override a hyperparameter: uv run src/main.py model.estimator.n_estimators=500
+name: random_forest
+scale_features: false
+estimator:
+  _target_: sklearn.ensemble.RandomForestClassifier
+  n_estimators: 200
+  max_depth: null
+  min_samples_leaf: 1
+  random_state: ${seed}
+  n_jobs: -1
