@@ -1,7 +1,7 @@
 # Reproducible runtime: same OS, Python and locked dependencies everywhere.
 # Build:  docker compose build          (or: docker build -t {{ project_slug }} .)
 # Run:    docker compose run --rm train model=logistic_regression
-FROM ghcr.io/astral-sh/uv:python{{ python_version }}-bookworm-slim
+FROM ghcr.io/astral-sh/uv:python{{ python_version }}-trixie-slim
 
 ENV UV_COMPILE_BYTECODE=1 \
     UV_LINK_MODE=copy \

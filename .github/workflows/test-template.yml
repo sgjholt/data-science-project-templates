@@ -7,13 +7,17 @@ on:
 
 jobs:
   render-and-test:
+    name: py${{ matrix.python }} docker=${{ matrix.use_docker }}
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
+        python: ["3.12", "3.13", "3.14", "3.15"]
         use_docker: ["false", "true"]
     steps:
       - uses: actions/checkout@v4
       - uses: astral-sh/setup-uv@v6
       - name: Render template and test generated project
+        env:
+          PYTHON_VERSION: ${{ matrix.python }}
         run: scripts/test-template.sh ${{ matrix.use_docker }}

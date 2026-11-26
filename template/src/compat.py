@@ -1,6 +1,6 @@
-"""Python 3.14 compatibility shim for hydra-core 1.3.x. Delete once hydra-core >= 1.4 is stable.
+"""Python 3.14+ compatibility shim for hydra-core 1.3.x. Delete once hydra-core >= 1.4 is stable.
 
-Python 3.14's argparse validates help text in `add_argument` and requires a `str`.
+Python 3.14+ argparse validates help text in `add_argument` and requires a `str`.
 Hydra 1.3.x passes a lazy, non-string help object for `--shell-completion`, so
 `@hydra.main` fails with "ValueError: badly formed help string". This shim converts
 non-string help to `str` before the check; string help is untouched.
