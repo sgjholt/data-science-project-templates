@@ -67,15 +67,16 @@ def test_run_pipeline_logs_to_mlflow(tmp_path):
 def test_cli_end_to_end(tmp_path):
     """Exercise the real entrypoint exactly as a user would."""
     run_dir = tmp_path / "run"
+    tmp = tmp_path.as_posix()
     result = subprocess.run(
         [
             sys.executable,
             "src/main.py",
-            f"hydra.run.dir={run_dir}",
-            f"paths.raw_dir={tmp_path / 'raw'}",
-            f"paths.processed_dir={tmp_path / 'processed'}",
-            f"mlflow.tracking_uri=sqlite:///{tmp_path / 'mlflow.db'}",
-            f"mlflow.artifact_dir={tmp_path / 'artifacts'}",
+            f"hydra.run.dir={tmp}/run",
+            f"paths.raw_dir={tmp}/raw",
+            f"paths.processed_dir={tmp}/processed",
+            f"mlflow.tracking_uri=sqlite:///{tmp}/mlflow.db",
+            f"mlflow.artifact_dir={tmp}/artifacts",
             "model.estimator.n_estimators=10",
         ],
         cwd=PROJECT_ROOT,
