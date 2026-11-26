@@ -46,11 +46,20 @@ for use_docker in $VARIANTS; do
   echo "==> sweep"
   uv run src/main.py -m model=random_forest,logistic_regression mlflow.log_model=false
   test "$(find outputs/multirun -name metrics.json | wc -l)" -eq 2
+  echo "==> MLflow server checks (single run + 2 sweep runs)"
+  uv run python "$REPO/scripts/check_mlflow.py" --expect-runs 3
 
   if [[ "$use_docker" == "true" ]]; then
     echo "==> docker build + run"
+    # Container-only tracking: MLflow stores absolute artifact paths, so start from an
+    # empty mlruns/ rather than reusing the experiment the host runs created.
+    find mlruns -mindepth 1 ! -name .gitkeep -exec rm -rf {} +
     docker compose build
-    docker compose run --rm train model=logistic_regression mlflow.log_model=false
+    docker compose run --rm train model=logistic_regression
+    echo "==> MLflow checks against the compose mlflow service"
+    docker compose up -d mlflow
+    uv run python "$REPO/scripts/check_mlflow.py" --url http://localhost:5000 \
+      --expect-runs 1 --no-model-load || { docker compose logs mlflow; exit 1; }
     docker compose down --rmi local --volumes
   fi
   cd "$REPO"
